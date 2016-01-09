@@ -30,7 +30,17 @@ void TrainModel(vector<string> trainDataName){
     LBFRegressor regressor;
     regressor.Train(images,ground_truth_shapes,bounding_boxs);
     regressor.Save(modelPath+"LBF.model");
-    return;
 }
 
+void TrainSelfModel(std::string annotatenName) {
+    std::vector<cv::Mat_<uchar> > images;
+    std::vector<cv::Mat_<double> > ground_truth_shapes;
+    std::vector<BoundingBox> bounding_boxes;
+
+    loadSelfDataFromText(annotatenName, images, ground_truth_shapes, bounding_boxes);
+    std::cout << images.size() << " " << ground_truth_shapes.size() << " " << bounding_boxes.size() << std::endl;
+    LBFRegressor regressor;
+    regressor.Train(images,ground_truth_shapes,bounding_boxes);
+    regressor.Save(modelPath+"LBF.model");
+}
 

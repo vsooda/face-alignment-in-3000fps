@@ -19,7 +19,7 @@ Params global_params;
 
 typedef dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6> > > frontal_face_detector;
 
-string modelPath ="./../../model_69/";
+string modelPath ="../models/";
 string dataPath = "./../../Datasets/";
 string dlib_face_detector = "front_face.dat";
 string cascadeName = "haarcascade_frontalface_alt.xml";
@@ -46,9 +46,9 @@ void test_dlib_face_detect() {
 }
 
 int main( int argc, const char** argv ){
-    test_dlib_face_detect();
-    return 0;
-    if (argc > 1 && strcmp(argv[1],"TrainModel")==0){
+//    test_dlib_face_detect();
+//    return 0;
+    if (argc > 1 && ( strcmp(argv[1],"TrainModel")==0 || strcmp(argv[1], "traintxt") == 0)){
         InitializeGlobalParam();
     }
     else {
@@ -68,12 +68,18 @@ int main( int argc, const char** argv ){
         TrainModel(trainDataName);
     }
     else if (strcmp(argv[1], "TestModel")==0){
+        //test text: ./LBF.out TestModel ~/data/lfpw/lfpw_train.txt
         vector<string> testDataName;
-     // you need to modify this section according to your training dataset
-        testDataName.push_back("ibug");
-     //   testDataName.push_back("helen");
+        //testDataName.push_back("ibug");
+        testDataName.push_back(argv[2]);
         double MRSE = TestModel(testDataName);
         
+    }
+    else if (strcmp(argv[1], "traintxt") == 0) {
+        //train text format: ./LBF.out traintxt ~/data/lfpw/lfpw_train.txt
+        std::string annotateName(argv[2]);
+        std::cout << "annotationName: " << annotateName << std::endl;;
+        TrainSelfModel(annotateName);
     }
     else if (strcmp(argv[1], "Demo")==0){
         if (argc == 2){
@@ -110,7 +116,7 @@ void InitializeGlobalParam(){
 }
 
 void ReadGlobalParamFromFile(string path){
-    cout << "Loading GlobalParam..." << endl;
+    cout << "Loading GlobalParam... "  << path << endl;
     ifstream fin;
     fin.open(path);
     fin >> global_params.bagging_overlap;

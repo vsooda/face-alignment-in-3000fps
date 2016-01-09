@@ -18,8 +18,10 @@ This project is a C++ reimplementation of face alignment in 3000fps in the CVPR 
 
 1. Download datasets and get Path_Images.txt as [jwyang/face-alignment](https://github.com/jwyang/face-alignment). 
 
-2. To compiler the program: go to folder `build` and 
-   make build
+2. To compiler the program: create folder  `build` and build  
+
+   madir build
+
    cd build
    
    cmake ..

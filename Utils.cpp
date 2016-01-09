@@ -316,6 +316,62 @@ void LoadOpencvBbxData(string filepath,
     }
     fin.close();
 }
+
+void loadSelfDataFromText(std::string filepath, 
+              std::vector<cv::Mat_<uchar> >& images,
+              std::vector<cv::Mat_<double> >& ground_truth_shapes,
+              std::vector<BoundingBox> & bounding_box) {
+
+    FILE* fin = fopen(filepath.c_str(), "r");
+    if (fin == NULL){
+       printf("%s is no exists", filepath.c_str());
+       throw "load annotate data error";
+       return;
+    }
+    int landmarkNum = global_params.landmark_num;
+    std::cout << "global landmark num: " << landmarkNum << std::endl;
+    //std::string basename = "/home/research/data/photos/";
+    std::string basename = "/home/research/data/lfpw/trainset/";
+    char filename[80];
+    int cnt = 0;
+    int i = 0; 
+    while(fscanf(fin, "%s%*c", filename) != EOF) {
+        i++;
+        string fullname = basename + filename;
+        std::cout << i << " " << fullname << std::endl;
+        cv::Mat_<uchar>  temp = cv::imread(fullname, 0);
+        images.push_back(temp);
+
+        int left, top, right, bottom;
+        fscanf(fin, "%d %d %d %d%*c", &left, &top, &right, &bottom);
+
+        BoundingBox bb;
+        bb.start_x = left;
+        bb.start_y = top;
+        bb.width = right - left;
+        bb.height = bottom - top;
+        bb.centroid_x = bb.start_x + bb.width / 2.0;
+        bb.centroid_y = bb.start_y + bb.height / 2.0;
+        bounding_box.push_back(bb);
+        //std::cout << bb.start_x << " " << bb.start_y << " " << bb.width << " " << bb.height << std::endl;
+
+
+        cv::Mat_<double> ptsmat(landmarkNum, 2);
+        for(int j = 0; j < landmarkNum; j++) { 
+            int x, y;
+            fscanf(fin, "%d %d%*c", &x, &y);
+            ptsmat(j, 0) = x;
+            ptsmat(j, 1) = y;
+        }
+        //std::cout << ptsmat << std::endl;
+        ground_truth_shapes.push_back(ptsmat);
+    }
+    fclose(fin);
+
+    assert(ground_truth_shapes.size() == bounding_box.size());
+
+}
+
 double CalculateError(const Mat_<double>& ground_truth_shape, const Mat_<double>& predicted_shape){
     Mat_<double> temp;
     temp = ground_truth_shape.rowRange(36, 41)-ground_truth_shape.rowRange(42, 47);

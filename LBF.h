@@ -79,10 +79,17 @@ void SimilarityTransform(const cv::Mat_<double>& shape1, const cv::Mat_<double>&
                          cv::Mat_<double>& rotation,double& scale);
 double calculate_covariance(const std::vector<double>& v_1,
                             const std::vector<double>& v_2);
+
+void loadSelfDataFromText(std::string filepath, 
+              std::vector<cv::Mat_<uchar> >& images,
+              std::vector<cv::Mat_<double> >& ground_truth_shapes,
+              std::vector<BoundingBox> & bounding_box);
+
 void LoadData(std::string filepath,
               std::vector<cv::Mat_<uchar> >& images,
               std::vector<cv::Mat_<double> >& ground_truth_shapes,
               std::vector<BoundingBox> & bounding_box);
+
 void LoadDataAdjust(std::string filepath,
               std::vector<cv::Mat_<uchar> >& images,
               std::vector<cv::Mat_<double> >& ground_truth_shapes,
@@ -105,6 +112,7 @@ void adjustImage(cv::Mat_<uchar>& img,
                  cv::Mat_<double>& ground_truth_shape,
                  BoundingBox& bounding_box);
 
+void TrainSelfModel(std::string annotatenName);
 void  TrainModel(std::vector<std::string> trainDataName);
 double TestModel(std::vector<std::string> testDataName);
 int FaceDetectionAndAlignment(const char* inputname);

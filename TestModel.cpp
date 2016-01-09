@@ -21,7 +21,8 @@ double TestModel (vector<string> testDataName){
         else
             path = dataPath + testDataName[i] + "/Path_Images.txt";
         //LoadData(path, test_images, test_ground_truth_shapes, test_bounding_boxs);
-        LoadOpencvBbxData(path, test_images, test_ground_truth_shapes, test_bounding_boxs);
+        //LoadOpencvBbxData(path, test_images, test_ground_truth_shapes, test_bounding_boxs);
+        loadSelfDataFromText(testDataName[i], test_images, test_ground_truth_shapes, test_bounding_boxs);
     }
 //    LoadCofwTestData(test_images, test_ground_truth_shapes, test_bounding_boxs);
     

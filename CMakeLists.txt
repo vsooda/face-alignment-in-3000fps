@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 find_package( OpenCV REQUIRED )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
+set(Dlib_DIR "/home/research/tools/dlib-18.10/")
 
 set(source liblinear/blas/blas.h liblinear/blas/blasp.h liblinear/blas/daxpy.c liblinear/blas/ddot.c liblinear/blas/dnrm2.c liblinear/blas/dscal.c 
 liblinear/tron.cpp liblinear/tron.h liblinear/linear.h liblinear/linear.cpp  
@@ -10,7 +11,7 @@ LBF.h LBF.cpp TrainModel.cpp TestModel.cpp Facedetect.cpp Utils.cpp Tree.h Tree.
 
 #if you don't want to use openMP, you should comment this line
 FIND_PACKAGE( OpenMP REQUIRED)
-include(/home/research/tools/dlib-18.10/dlib/cmake)
+include(${Dlib_DIR}dlib/cmake)
 
 
 if(OPENMP_FOUND)
