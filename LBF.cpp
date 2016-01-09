@@ -21,8 +21,8 @@ typedef dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6> > > 
 
 string modelPath ="../models/";
 string dataPath = "./../../Datasets/";
-string dlib_face_detector = "front_face.dat";
-string cascadeName = "haarcascade_frontalface_alt.xml";
+string dlib_face_detector = "../data/front_face.dat";
+string cascadeName = "../data/haarcascade_frontalface_alt.xml";
 
 void InitializeGlobalParam(int landmark_num = 68);
 void PrintHelp();

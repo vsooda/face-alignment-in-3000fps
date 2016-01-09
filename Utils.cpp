@@ -357,8 +357,6 @@ void loadSelfDataFromText(std::string filepath,
         bb.centroid_x = bb.start_x + bb.width / 2.0;
         bb.centroid_y = bb.start_y + bb.height / 2.0;
         bounding_box.push_back(bb);
-        //std::cout << bb.start_x << " " << bb.start_y << " " << bb.width << " " << bb.height << std::endl;
-
 
         cv::Mat_<double> ptsmat(landmarkNum, 2);
         for(int j = 0; j < landmarkNum; j++) { 
@@ -366,8 +364,10 @@ void loadSelfDataFromText(std::string filepath,
             fscanf(fin, "%d %d%*c", &x, &y);
             ptsmat(j, 0) = x;
             ptsmat(j, 1) = y;
+            //cv::circle(temp, cv::Point2d(x, y),3, cv::Scalar(255, 0, 255), -1);
         }
-        //std::cout << ptsmat << std::endl;
+        //cv::imshow("temp", temp);
+        //cv::waitKey();
         ground_truth_shapes.push_back(ptsmat);
     }
     fclose(fin);

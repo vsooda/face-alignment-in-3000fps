@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 find_package( OpenCV REQUIRED )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
 set(Dlib_DIR "/home/research/tools/dlib-18.10/")
 
 set(source liblinear/blas/blas.h liblinear/blas/blasp.h liblinear/blas/daxpy.c liblinear/blas/ddot.c liblinear/blas/dnrm2.c liblinear/blas/dscal.c 
