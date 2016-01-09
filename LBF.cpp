@@ -24,7 +24,7 @@ string dataPath = "./../../Datasets/";
 string dlib_face_detector = "front_face.dat";
 string cascadeName = "haarcascade_frontalface_alt.xml";
 
-void InitializeGlobalParam();
+void InitializeGlobalParam(int landmark_num = 68);
 void PrintHelp();
 
 void test_dlib_face_detect() {
@@ -49,7 +49,11 @@ int main( int argc, const char** argv ){
 //    test_dlib_face_detect();
 //    return 0;
     if (argc > 1 && ( strcmp(argv[1],"TrainModel")==0 || strcmp(argv[1], "traintxt") == 0)){
-        InitializeGlobalParam();
+        int landmark_num = 68;
+        if (argc > 3) {
+            landmark_num = atoi(argv[3]);
+        }
+        InitializeGlobalParam(landmark_num);
     }
     else {
         ReadGlobalParamFromFile(modelPath+"LBF.model");
@@ -87,6 +91,8 @@ int main( int argc, const char** argv ){
         }
         else if(argc ==3){
             return FaceDetectionAndAlignment(argv[2]);
+        } else {
+            dlibDetectAndDraw(argc, argv);
         }
     }
     else {
@@ -96,11 +102,11 @@ int main( int argc, const char** argv ){
 }
 
 // set the parameters when training models.
-void InitializeGlobalParam(){
+void InitializeGlobalParam(int landmark_num){
     global_params.bagging_overlap = 0.4;
     global_params.max_numtrees = 10;
     global_params.max_depth = 5;
-    global_params.landmark_num = 68;
+    global_params.landmark_num = landmark_num;
     global_params.initial_num = 5;
     
     global_params.max_numstage = 7;

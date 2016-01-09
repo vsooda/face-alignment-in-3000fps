@@ -330,8 +330,12 @@ void loadSelfDataFromText(std::string filepath,
     }
     int landmarkNum = global_params.landmark_num;
     std::cout << "global landmark num: " << landmarkNum << std::endl;
-    //std::string basename = "/home/research/data/photos/";
-    std::string basename = "/home/research/data/lfpw/trainset/";
+    std::string basename;
+    if (landmarkNum == 74) {
+        basename = "/home/research/data/photos/";
+    } else {
+        basename = "/home/research/data/lfpw/trainset/";
+    }
     char filename[80];
     int cnt = 0;
     int i = 0; 
@@ -374,7 +378,12 @@ void loadSelfDataFromText(std::string filepath,
 
 double CalculateError(const Mat_<double>& ground_truth_shape, const Mat_<double>& predicted_shape){
     Mat_<double> temp;
-    temp = ground_truth_shape.rowRange(36, 41)-ground_truth_shape.rowRange(42, 47);
+    if (global_params.landmark_num == 68) {
+        temp = ground_truth_shape.rowRange(36, 41)-ground_truth_shape.rowRange(42, 47);
+    } else if (global_params.landmark_num == 74) {
+        temp = ground_truth_shape.row(30) - ground_truth_shape.row(34);
+    }
+
     double x =mean(temp.col(0))[0];
     double y = mean(temp.col(1))[1];
     double interocular_distance = sqrt(x*x+y*y);

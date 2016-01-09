@@ -118,4 +118,5 @@ double TestModel(std::vector<std::string> testDataName);
 int FaceDetectionAndAlignment(const char* inputname);
 void ReadGlobalParamFromFile(cv::string path);
 double CalculateError(const cv::Mat_<double>& ground_truth_shape, const cv::Mat_<double>& predicted_shape);
+void dlibDetectAndDraw(int argc, const char** argv);
 #endif

@@ -8,13 +8,18 @@
 #include "LBFRegressor.h"
 using namespace std;
 using namespace cv;
+#include <dlib/opencv.h>
+#include <dlib/image_processing.h>
+
+typedef dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6> > > frontal_face_detector;
+
 int save_count=0;
 void detectAndDraw(Mat& img,
                    CascadeClassifier& nestedCascade, LBFRegressor& regressor,
                    double scale, bool tryflip );
 
 int FaceDetectionAndAlignment(const char* inputname){
-       extern string cascadeName;
+    extern string cascadeName;
     string inputName;
     CvCapture* capture = 0;
     Mat frame, frameCopy, image;
@@ -208,3 +213,67 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
         imwrite(to_string(save_count)+".jpg", img);
     }
 }
+
+std::vector<cv::Rect> dlibFaceDetect(frontal_face_detector detector, cv::Mat gray) { 
+    dlib::array2d<unsigned char> img;
+    dlib::cv_image<unsigned char> *pimg = new dlib::cv_image<unsigned char>(gray);
+    assign_image(img, *pimg);
+    delete pimg;
+    std::vector<dlib::rectangle> dets;
+    dets  = detector(img);
+    std::vector<cv::Rect> faces;
+    for(int i = 0; i < dets.size(); i++) {
+        cv::Rect rect = cv::Rect(cv::Point(dets[i].left(), dets[i].top()), cv::Point(dets[i].right(), dets[i].bottom()) );
+        faces.push_back(rect);
+    }
+    return faces;
+}
+
+void dlibDetectAndDraw(int argc, const char** argv) {
+    LBFRegressor regressor;
+    regressor.Load(modelPath+"LBF.model");
+    frontal_face_detector detector;
+    extern string dlib_face_detector;
+
+    dlib::deserialize(dlib_face_detector) >> detector;
+    
+
+    for (int i = 4; i < argc; i++) {
+        cv::Mat src = cv::imread(argv[i]);
+        cv::Mat gray;
+        if (src.channels() == 3) {
+            cv::cvtColor(src, gray, CV_BGR2GRAY);
+        } else if(src.channels() == 1) {
+            gray = src;
+        }
+        std::vector<cv::Rect> faces = dlibFaceDetect(detector, gray);
+        double t =(double)cvGetTickCount();
+        for( vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++, i++ ){
+            Point center;
+            cv::Scalar color(255, 0, 255);
+            BoundingBox boundingbox;
+            
+            boundingbox.start_x = r->x;
+            boundingbox.start_y = r->y;
+            boundingbox.width   = (r->width-1);
+            boundingbox.height  = (r->height-1);
+            boundingbox.centroid_x = boundingbox.start_x + boundingbox.width/2.0;
+            boundingbox.centroid_y = boundingbox.start_y + boundingbox.height/2.0;
+            
+            t =(double)cvGetTickCount();
+            Mat_<double> current_shape = regressor.Predict(gray, boundingbox,1);
+            t = (double)cvGetTickCount() - t;
+            printf( "alignment time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+    //        // draw bounding box
+    //        rectangle(img, cvPoint(boundingbox.start_x,boundingbox.start_y),
+    //                  cvPoint(boundingbox.start_x+boundingbox.width,boundingbox.start_y+boundingbox.height),Scalar(0,255,0), 1, 8, 0);
+            // draw result :: red
+            for(int i = 0;i < global_params.landmark_num;i++){
+                 circle(src,Point2d(current_shape(i,0),current_shape(i,1)),3,Scalar(255,255,255),-1,8,0);
+            }
+        }
+        cv::imshow( "result", src);
+        char a = waitKey(0);
+    }
+}
+
