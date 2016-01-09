@@ -8,6 +8,8 @@
 
 #include "LBF.h"
 #include "LBFRegressor.h"
+#include <dlib/opencv.h>
+#include <dlib/image_processing.h>
 using namespace std;
 using namespace cv;
 
@@ -15,33 +17,37 @@ using namespace cv;
 Params global_params;
 
 
+typedef dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6> > > frontal_face_detector;
+
 string modelPath ="./../../model_69/";
 string dataPath = "./../../Datasets/";
+string dlib_face_detector = "front_face.dat";
 string cascadeName = "haarcascade_frontalface_alt.xml";
 
 void InitializeGlobalParam();
 void PrintHelp();
 
+void test_dlib_face_detect() {
+    cv::Mat gray = cv::imread("img/1.jpg", 0);
+    frontal_face_detector detector;
+    dlib::deserialize(dlib_face_detector) >> detector;
+    dlib::array2d<unsigned char> img;
+    dlib::cv_image<unsigned char> *pimg = new dlib::cv_image<unsigned char>(gray);
+    assign_image(img, *pimg);
+    delete pimg;
+    std::vector<dlib::rectangle> dets;
+    dets  = detector(img);
+    for (int i = 0; i < dets.size(); i++) {
+        cv::Rect rect = cv::Rect(cv::Point(dets[i].left(), dets[i].top()), cv::Point(dets[i].right(), dets[i].bottom()) );
+        cv::rectangle(gray, rect, cv::Scalar(255));
+    }
+    cv::imshow("dst", gray);
+    cv::waitKey();
+}
+
 int main( int argc, const char** argv ){
-//    double rs[3] = {0.4,0.15,0.08};
-//    for (int i=0;i<3;i++){
-//        Mat image = imread("/Users/lequan/workspace/LBF/Datasets/afw/437595409_1.jpg");
-//        string name1("/Users/lequan/workspace/LBF/Datasets/afw/437595409_1.pts");
-//        InitializeGlobalParam();
-//        Mat_<double> ground_truth_shape = LoadGroundTruthShape(name1);
-//        BoundingBox bbx = CalculateBoundingBox(ground_truth_shape);
-//        double r = rs[i]*bbx.height/2.0;
-//        int a[13]={18,22,37,40,23,27,43,46,31,49,55,52,58};
-//        for(int j = 0;j <13;j++){
-//            cout <<j<<endl;
-//            circle(image,Point2d(ground_truth_shape(a[j]-1,0),ground_truth_shape(a[j]-1,1)),r,Scalar(255,255,255),2,8,0);
-//        }
-//        imshow("result", image);
-//        waitKey(0);
-//        string name = "radius" + to_string(i)+".jpg";
-//        imwrite(name,image);
-//    }
-    //initialize parameters
+    test_dlib_face_detect();
+    return 0;
     if (argc > 1 && strcmp(argv[1],"TrainModel")==0){
         InitializeGlobalParam();
     }

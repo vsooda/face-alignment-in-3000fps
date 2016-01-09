@@ -14,14 +14,17 @@ This project is a C++ reimplementation of face alignment in 3000fps in the CVPR 
  I add a VS project. 
  
 ### Usage
+0. Download dlib for face detect
 
 1. Download datasets and get Path_Images.txt as [jwyang/face-alignment](https://github.com/jwyang/face-alignment). 
 
 2. To compiler the program: go to folder `build` and 
+   make build
+   cd build
    
-   cmake .
+   cmake ..
   
-   make
+   make -j4
 
 3. To train a new model: set global parameters, model path, train database name in `LBF.cpp`. Use `"LBF.out TrainModel"`.
 
