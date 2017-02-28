@@ -10,8 +10,6 @@
 #include "LBFRegressor.h"
 #include <dlib/opencv.h>
 #include <dlib/image_processing.h>
-using namespace std;
-using namespace cv;
 
 // parameters
 Params global_params;
@@ -19,10 +17,10 @@ Params global_params;
 
 typedef dlib::object_detector<dlib::scan_fhog_pyramid<dlib::pyramid_down<6> > > frontal_face_detector;
 
-string modelPath ="../models/";
-string dataPath = "./../../Datasets/";
-string dlib_face_detector = "../data/front_face.dat";
-string cascadeName = "../data/haarcascade_frontalface_alt.xml";
+std::string modelPath ="../models/";
+std::string dataPath = "./../../Datasets/";
+std::string dlib_face_detector = "../data/front_face.dat";
+std::string cascadeName = "../data/haarcascade_frontalface_alt.xml";
 
 void InitializeGlobalParam(int landmark_num = 68);
 void PrintHelp();
@@ -64,7 +62,7 @@ int main( int argc, const char** argv ){
         PrintHelp();
     }
     else if(strcmp(argv[1],"TrainModel")==0){
-        vector<string> trainDataName;
+        std::vector<std::string> trainDataName;
      // you need to modify this section according to your training dataset
         trainDataName.push_back("afw");
         trainDataName.push_back("helen");
@@ -73,7 +71,7 @@ int main( int argc, const char** argv ){
     }
     else if (strcmp(argv[1], "TestModel")==0){
         //test text: ./LBF.out TestModel ~/data/lfpw/lfpw_train.txt
-        vector<string> testDataName;
+        std::vector<std::string> testDataName;
         //testDataName.push_back("ibug");
         testDataName.push_back(argv[2]);
         double MRSE = TestModel(testDataName);
@@ -121,9 +119,9 @@ void InitializeGlobalParam(int landmark_num){
     global_params.max_numthreshs = 500;
 }
 
-void ReadGlobalParamFromFile(string path){
-    cout << "Loading GlobalParam... "  << path << endl;
-    ifstream fin;
+void ReadGlobalParamFromFile(std::string path){
+    std::cout << "Loading GlobalParam... "  << path << std::endl;
+    std::ifstream fin;
     fin.open(path);
     fin >> global_params.bagging_overlap;
     fin >> global_params.max_numtrees;
@@ -140,15 +138,14 @@ void ReadGlobalParamFromFile(string path){
     for (int i = 0; i < global_params.max_numstage; i++){
         fin >> global_params.max_numfeats[i];
     }
-    cout << "Loading GlobalParam end"<<endl;
+    std::cout << "Loading GlobalParam end"<< std::endl;
     fin.close();
 }
 void PrintHelp(){
-    cout << "Useage:"<<endl;
-    cout << "1. train your own model:    LBF.out  TrainModel "<<endl;
-    cout << "2. test model on dataset:   LBF.out  TestModel"<<endl;
-    cout << "3. test model via a camera: LBF.out  Demo "<<endl;
-    cout << "4. test model on a pic:     LBF.out  Demo xx.jpg"<<endl;
-    cout << "5. test model on pic set:   LBF.out  Demo Img_Path.txt"<<endl;
-    cout << endl;
+    std::cout << "1. train your own model:    LBF.out  TrainModel "<< std::endl;
+    std::cout << "2. test model on dataset:   LBF.out  TestModel"<<std::endl;
+    std::cout << "3. test model via a camera: LBF.out  Demo "<<std::endl;
+    std::cout << "4. test model on a pic:     LBF.out  Demo xx.jpg"<<std::endl;
+    std::cout << "5. test model on pic set:   LBF.out  Demo Img_Path.txt"<<std::endl;
+    std::cout << std::endl;
 }

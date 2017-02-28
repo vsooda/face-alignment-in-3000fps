@@ -8,13 +8,12 @@
 
 #include "LBFRegressor.h"
 using namespace std;
-using namespace cv;
 
 struct feature_node ** LBFRegressor::DeriveBinaryFeat(
                                     const RandomForest& randf,
-                                    const vector<Mat_<uchar> >& images,
-                                    const vector<Mat_<double> >& current_shapes,
-                                    const vector<BoundingBox> & bounding_boxs){
+                                    const std::vector<cv::Mat_<uchar> >& images,
+                                    const std::vector<cv::Mat_<double> >& current_shapes,
+                                    const std::vector<BoundingBox> & bounding_boxs){
     
     // initilaize the memory for binfeatures
     struct feature_node **binfeatures;
@@ -27,7 +26,7 @@ struct feature_node ** LBFRegressor::DeriveBinaryFeat(
 //    int ind;
 //    int leafnode_per_tree = pow(2,(randf.max_depth_-1));
     
-    Mat_<double> rotation;
+    cv::Mat_<double> rotation;
     double scale;
 
     // extract feature for each samples
@@ -55,11 +54,11 @@ struct feature_node ** LBFRegressor::DeriveBinaryFeat(
 // index: the start index of tree.
 void LBFRegressor::GetCodefromRandomForest(struct feature_node *binfeature,
                                            const int index,
-                                           const vector<Tree>& rand_forest,
-                                           const Mat_<uchar>& image,
-                                           const Mat_<double>& shape,
+                                           const std::vector<Tree>& rand_forest,
+                                           const cv::Mat_<uchar>& image,
+                                           const cv::Mat_<double>& shape,
                                            const BoundingBox& bounding_box,
-                                           const Mat_<double>& rotation,
+                                           const cv::Mat_<double>& rotation,
                                            const double scale){
     
     int leafnode_per_tree = pow(2,rand_forest[0].max_depth_-1);
@@ -108,10 +107,10 @@ void LBFRegressor::GetCodefromRandomForest(struct feature_node *binfeature,
     }
 }
 int  LBFRegressor::GetCodefromTree(const Tree& tree,
-                                   const Mat_<uchar>& image,
-                                   const Mat_<double>& shape,
+                                   const cv::Mat_<uchar>& image,
+                                   const cv::Mat_<double>& shape,
                                    const BoundingBox& bounding_box,
-                                   const Mat_<double>& rotation,
+                                   const cv::Mat_<double>& rotation,
                                    const double scale){
     int currnode = 0;
     int bincode = 1;
@@ -152,12 +151,12 @@ int  LBFRegressor::GetCodefromTree(const Tree& tree,
 };
 
 void LBFRegressor::GlobalRegression(struct feature_node **binfeatures,
-                                    const vector<Mat_<double> >& shapes_residual,
-                                    vector<Mat_<double> >& current_shapes,
-                                    const vector<BoundingBox> & bounding_boxs,
-                                    const Mat_<double>& mean_shape,
+                                    const std::vector<cv::Mat_<double> >& shapes_residual,
+                                    std::vector<cv::Mat_<double> >& current_shapes,
+                                    const std::vector<BoundingBox> & bounding_boxs,
+                                    const cv::Mat_<double>& mean_shape,
                                     //Mat_<double>& W,
-                                    vector<struct model*>& models,
+                                    std::vector<struct model*>& models,
                                     int num_feature,
                                     int num_train_sample,
                                     int stage
@@ -214,9 +213,9 @@ void LBFRegressor::GlobalRegression(struct feature_node **binfeatures,
     // update the current shape and shapes_residual
     double tmp;
     double scale;
-    Mat_<double>rotation;
-    Mat_<double> deltashape_bar(num_residual/2,2);
-    Mat_<double> deltashape_bar1(num_residual/2,2);
+    cv::Mat_<double>rotation;
+    cv::Mat_<double> deltashape_bar(num_residual/2,2);
+    cv::Mat_<double> deltashape_bar1(num_residual/2,2);
     for (int i=0;i<num_train_sample;i++){
         #pragma omp parallel for
         for (int j=0;j<num_residual;j++){
@@ -241,15 +240,15 @@ void LBFRegressor::GlobalRegression(struct feature_node **binfeatures,
 }
 
 void LBFRegressor::GlobalPrediction(struct feature_node** binfeatures,
-                                    vector<Mat_<double> >& current_shapes,
-                                    const vector<BoundingBox> & bounding_boxs,
+                                    std::vector<cv::Mat_<double> >& current_shapes,
+                                    const std::vector<BoundingBox> & bounding_boxs,
                                     int stage){
     int num_train_sample = (int)current_shapes.size();
     int num_residual = current_shapes[0].rows*2;
     double tmp;
     double scale;
-    Mat_<double>rotation;
-    Mat_<double> deltashape_bar(num_residual/2,2);
+    cv::Mat_<double>rotation;
+    cv::Mat_<double> deltashape_bar(num_residual/2,2);
    // #pragma omp parallel for
     for (int i=0;i<num_train_sample;i++){
         current_shapes[i] = ProjectShape(current_shapes[i],bounding_boxs[i]);
@@ -273,17 +272,17 @@ void LBFRegressor::GlobalPrediction(struct feature_node** binfeatures,
     }
 }
 
-void LBFRegressor::Train(const vector<Mat_<uchar> >& images,
-                         const vector<Mat_<double> >& ground_truth_shapes,
-                         const vector<BoundingBox> & bounding_boxs){
+void LBFRegressor::Train(const std::vector<cv::Mat_<uchar> >& images,
+                         const std::vector<cv::Mat_<double> >& ground_truth_shapes,
+                         const std::vector<BoundingBox> & bounding_boxs){
     
     // data augmentation and multiple initialization
-    vector<Mat_<uchar> > augmented_images;
-    vector<BoundingBox> augmented_bounding_boxs;
-    vector<Mat_<double> > augmented_ground_truth_shapes;
-    vector<Mat_<double> > current_shapes;
+    std::vector<cv::Mat_<uchar> > augmented_images;
+    std::vector<BoundingBox> augmented_bounding_boxs;
+    std::vector<cv::Mat_<double> > augmented_ground_truth_shapes;
+    std::vector<cv::Mat_<double> > current_shapes;
     
-    RNG random_generator(getTickCount());
+    cv::RNG random_generator(cv::getTickCount());
     for(int i = 0;i < images.size();i++){
         for(int j = 0;j < global_params.initial_num;j++){
             int index = 0;
@@ -298,7 +297,7 @@ void LBFRegressor::Train(const vector<Mat_<uchar> >& images,
             augmented_bounding_boxs.push_back(bounding_boxs[i]);
             
             // 2. Project current shape to bounding box of ground truth shapes
-            Mat_<double> temp = ProjectShape(ground_truth_shapes[index], bounding_boxs[index]);
+            cv::Mat_<double> temp = ProjectShape(ground_truth_shapes[index], bounding_boxs[index]);
             temp = ReProjectShape(temp, bounding_boxs[i]);
             current_shapes.push_back(temp);
         }
@@ -355,15 +354,15 @@ void LBFRegressor::ReleaseFeatureSpace(struct feature_node ** binfeatures,
     delete[] binfeatures;
 }
 
-vector<Mat_<double> > LBFRegressor::Predict(const vector<Mat_<uchar> >& images,
-                                    const vector<BoundingBox>& bounding_boxs,
-                                    const vector<Mat_<double> >& ground_truth_shapes,
+vector<cv::Mat_<double> > LBFRegressor::Predict(const std::vector<cv::Mat_<uchar> >& images,
+                                    const std::vector<BoundingBox>& bounding_boxs,
+                                    const std::vector<cv::Mat_<double> >& ground_truth_shapes,
                                     int initial_num){
     
-    vector<Mat_<double> > current_shapes;
+    std::vector<cv::Mat_<double> > current_shapes;
 
     for (int i=0; i<images.size();i++){
-        Mat_<double> current_shape = ReProjectShape(mean_shape_, bounding_boxs[i]);
+        cv::Mat_<double> current_shape = ReProjectShape(mean_shape_, bounding_boxs[i]);
         current_shapes.push_back(current_shape);
     }
     double MRSE_sum = 0;
@@ -394,12 +393,12 @@ vector<Mat_<double> > LBFRegressor::Predict(const vector<Mat_<uchar> >& images,
     return current_shapes;
 }
 
-Mat_<double>  LBFRegressor::Predict(const cv::Mat_<uchar>& image,
+cv::Mat_<double>  LBFRegressor::Predict(const cv::Mat_<uchar>& image,
                                     const BoundingBox& bounding_box,
                                     int initial_num){
-    vector<Mat_<uchar> > images;
-    vector<Mat_<double> > current_shapes;
-    vector<BoundingBox>  bounding_boxs;
+    std::vector<cv::Mat_<uchar> > images;
+    std::vector<cv::Mat_<double> > current_shapes;
+    std::vector<BoundingBox>  bounding_boxs;
 
 
     images.push_back(image);
@@ -514,7 +513,7 @@ void  LBFRegressor::ReadGlobalParam(ifstream& fin){
 }
 
 void LBFRegressor::ReadRegressor(ifstream& fin){
-    mean_shape_ = Mat::zeros(global_params.landmark_num,2,CV_64FC1);
+    mean_shape_ = cv::Mat::zeros(global_params.landmark_num,2,CV_64FC1);
     for(int i = 0;i < global_params.landmark_num;i++){
         fin >> mean_shape_(i,0) >> mean_shape_(i,1);
     }

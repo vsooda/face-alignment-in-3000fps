@@ -45,8 +45,8 @@ struct Params{
     int max_numthreshs;
 };
 extern Params global_params;
-extern cv::string modelPath;
-extern cv::string dataPath;
+extern std::string modelPath;
+extern std::string dataPath;
 class BoundingBox{
     public:
         double start_x;
@@ -116,7 +116,7 @@ void TrainSelfModel(std::string annotatenName);
 void  TrainModel(std::vector<std::string> trainDataName);
 double TestModel(std::vector<std::string> testDataName);
 int FaceDetectionAndAlignment(const char* inputname);
-void ReadGlobalParamFromFile(cv::string path);
+void ReadGlobalParamFromFile(std::string path);
 double CalculateError(const cv::Mat_<double>& ground_truth_shape, const cv::Mat_<double>& predicted_shape);
 void dlibDetectAndDraw(int argc, const char** argv);
 #endif

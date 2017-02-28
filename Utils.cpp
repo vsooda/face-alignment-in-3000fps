@@ -332,9 +332,9 @@ void loadSelfDataFromText(std::string filepath,
     std::cout << "global landmark num: " << landmarkNum << std::endl;
     std::string basename;
     if (landmarkNum == 74) {
-        basename = "/home/research/data/photos/";
+        basename = "/home/sooda/data/photos/";
     } else {
-        basename = "/home/research/data/lfpw/trainset/";
+        basename = "/home/sooda/data/lfpw/trainset/";
     }
     char filename[80];
     int cnt = 0;
